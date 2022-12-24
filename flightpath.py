@@ -16,7 +16,7 @@ class FlightPath:
             raise FlightPathBroken("Entrer invalide")
         if via_flight.departure_code != self.airports_l[-1].code:
             raise FlightPathBroken(
-                "Le vol ne part pas de l'aéroport de départ du chemin")
+                "Le vol ne part pas de l'aéroport de départ")
         if via_flight.arrival_code != dst_airport.code:
             raise FlightPathBroken(
                 "Le vol n'arrive pas à l'aéroport de destination")
