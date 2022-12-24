@@ -13,13 +13,13 @@ class Airport:
 
 
 class Flight:
-    def __init__(self, departure_code: str = None, arrival_code: str = None, duration: float = None):
-        self.departure_code = departure_code
-        self.arrival_code = arrival_code
+    def __init__(self, src_code: str = None, dst_code: str = None, duration: float = None):
+        self.src_code = src_code
+        self.dst_code = dst_code
         self.duration = duration
 
     def __str__(self):
-        return f'De {self.departure_code} à {self.arrival_code} - Durée : {self.duration} heures'
+        return f'De {self.src_code} à {self.dst_code} - Durée : {self.duration} heures'
 
 
 class FlightMap:
@@ -40,9 +40,9 @@ class FlightMap:
         with open(csv_file, 'r') as f:
             reader = csv.reader(f, quotechar='"', skipinitialspace=True)
             for row in reader:
-                departure_code, arrival_code, duration = row
+                src_code, dst_code, duration = row
                 self.flights_list.append(
-                    Flight(departure_code, arrival_code, float(duration)))
+                    Flight(src_code, dst_code, float(duration)))
 
     def airports(self):
         return self.airports_list
@@ -58,23 +58,23 @@ class FlightMap:
 
     def flight_exist(self, src_airport_code: str, dst_airport_code: str) -> bool:
         for f in self.flights_list:
-            # print('h'+f.arrival_code + dst_airport_code + 'h')
-            if f.departure_code == src_airport_code and f.arrival_code == dst_airport_code:
+            # print('h'+f.dst_code + dst_airport_code + 'h')
+            if f.src_code == src_airport_code and f.dst_code == dst_airport_code:
                 return True
         return False
 
     def flights_where(self, airport_code: str) -> list[Flight]:
         flights = []
         for flight in self.flights_list:
-            if flight.departure_code == airport_code or flight.arrival_code == airport_code:
+            if flight.src_code == airport_code or flight.dst_code == airport_code:
                 flights.append(flight)
         return flights
 
     def airports_from(self, airport_code: str) -> list[Airport]:
         airports = []
         for flight in self.flights_where(airport_code):
-            if flight.departure_code == airport_code:
-                airport = self.airport_find(flight.arrival_code)
+            if flight.src_code == airport_code:
+                airport = self.airport_find(flight.dst_code)
                 if airport:
                     airports.append(airport)
         return airports
@@ -99,17 +99,15 @@ class FlightPathDuplicate(Exception):
 
 class FlightPath():
 
-
     def __init__(self, src_airport: Airport) -> None:
-            # Initialise la liste d'aéroports avec l'aéroport de départ
+        # Initialise la liste d'aéroports avec l'aéroport de départ
         self.airports_list = [src_airport]
 # Initialise la liste de vols vide
         self.flights_list = []
 
-
     def add(self, dst_airport: Airport, via_flight: Flight) -> None:
-    # Vérifie que le vol via_flight passe par l'aéroport de départ du chemin
-        if self.airports_list[-1].code != via_flight.departure_code:
+        # Vérifie que le vol via_flight passe par l'aéroport de départ du chemin
+        if self.airports_list[-1].code != via_flight.src_code:
             raise FlightPathBroken(
                 'Le vol {} ne passe pas par l\'aéroport de départ du chemin'.format(via_flight))
     # Vérifie que l'aéroport de destination n'a pas déjà été ajouté au chemin
@@ -121,18 +119,14 @@ class FlightPath():
     # Ajoute le vol à la liste des vols
         self.flights_list.append(via_flight)
 
-
     def flights(self) -> list[Flight]:
         return self.flights_list
-
 
     def airports(self) -> list[Airport]:
         return self.airports_list
 
-
     def steps(self) -> float:
         return len(self.flights_list)
-
 
     def duration(self) -> float:
         return sum([flight.duration for flight in self.flights_list])
@@ -141,7 +135,7 @@ class FlightPath():
 def test_flight_path():
     # Création d'un aéroport de départ
     src_airport = Airport(name='Paris Charles de Gaulle Airport',
-        code='CDG', lat=49.012779, longitude=2.55)
+                          code='CDG', lat=49.012779, longitude=2.55)
 
     # Initialisation d'un objet FlightPath avec l'aéroport de départ
     path = FlightPath(src_airport)
@@ -162,10 +156,11 @@ def test_flight_path():
 def test_init():
 
     src_airport = Airport(name='Paris Charles de Gaulle Airport',
-        code='CDG', lat=49.012779, longitude=2.55)
+                          code='CDG', lat=49.012779, longitude=2.55)
 
     path = FlightPath(src_airport)
 
     assert path.src_airport == src_airport
+
 
 test_init()

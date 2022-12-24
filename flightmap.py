@@ -1,7 +1,9 @@
 import csv
 from airport import Airport
 from flight import Flight
-from aeorportnotfind import AeroNotFound
+from exception.aeorportnotfind import AeroNotFound
+
+
 class FlightMap:
 
     def __init__(self):
@@ -20,9 +22,9 @@ class FlightMap:
         with open(csv_file, 'r') as f:
             reader = csv.reader(f, quotechar='"', skipinitialspace=True)
             for row in reader:
-                departure_code, arrival_code, duration = row
+                src_code, dst_code, duration = row
                 self.flights_list.append(
-                    Flight(departure_code, arrival_code, float(duration)))
+                    Flight(src_code, dst_code, float(duration)))
 
     def airports(self):
         return self.airports_list
@@ -34,35 +36,35 @@ class FlightMap:
         for i in self.airports_list:
             if i.code == airport_code:
                 return i
-        
+
         return None
 
     def airport_find_path(self, airport_code: str) -> Airport:
         for i in self.airports_list:
             if i.code == airport_code:
                 return i
-            
+
         raise AeroNotFound("L'aéroport n'a pas été trouvé")
 
     def flight_exist(self, src_airport_code: str, dst_airport_code: str) -> bool:
         for f in self.flights_list:
-            # print('h'+f.arrival_code + dst_airport_code + 'h')
-            if f.departure_code == src_airport_code and f.arrival_code == dst_airport_code:
+            # print('h'+f.dst_code + dst_airport_code + 'h')
+            if f.src_code == src_airport_code and f.dst_code == dst_airport_code:
                 return f
         return None
 
     def flights_where(self, airport_code: str) -> list[Flight]:
         flights = []
         for flight in self.flights_list:
-            if flight.departure_code == airport_code or flight.arrival_code == airport_code:
+            if flight.src_code == airport_code or flight.dst_code == airport_code:
                 flights.append(flight)
         return flights
 
     def airports_from(self, airport_code: str) -> list[Airport]:
         airports = []
         for flight in self.flights_where(airport_code):
-            if flight.departure_code == airport_code:
-                airport = self.airport_find(flight.arrival_code)
+            if flight.src_code == airport_code:
+                airport = self.airport_find(flight.dst_code)
                 if airport:
                     airports.append(airport)
         return airports
@@ -75,3 +77,26 @@ class FlightMap:
         for flight in self.flights:
             flight_str += f' - {flight}\n'
         return airport_str + flight_str
+
+
+def test_flight_map():
+    flight_map = FlightMap()
+    flight_map.import_flights("./doc/flights.csv")
+    flight_map.import_airports("./doc/aeroports.csv")
+    print("Aéroports :")
+    for airport in flight_map.airports():
+        print(f" - {airport}")
+    print("Vols :")
+    for flight in flight_map.flights():
+        print(f" - {flight}")
+    print("Recherche de l'aéroport CDG :")
+    print(flight_map.airport_find("CDG"))
+    print("Vols partant de CDG :")
+    for flight in flight_map.flights_where("CDG"):
+        print(f" - {flight}")
+    print("Aéroports accessibles depuis CDG :")
+    for airport in flight_map.airports_from("CDG"):
+        print(f" - {airport}")
+
+# test_flight_map()
+
