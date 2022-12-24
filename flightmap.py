@@ -1,7 +1,7 @@
 import csv
 from airport import Airport
 from flight import Flight
-
+from aeorportnotfind import AeroNotFound
 class FlightMap:
 
     def __init__(self):
@@ -34,14 +34,22 @@ class FlightMap:
         for i in self.airports_list:
             if i.code == airport_code:
                 return i
+        
         return None
+
+    def airport_find_path(self, airport_code: str) -> Airport:
+        for i in self.airports_list:
+            if i.code == airport_code:
+                return i
+            
+        raise AeroNotFound("L'aéroport n'a pas été trouvé")
 
     def flight_exist(self, src_airport_code: str, dst_airport_code: str) -> bool:
         for f in self.flights_list:
             # print('h'+f.arrival_code + dst_airport_code + 'h')
             if f.departure_code == src_airport_code and f.arrival_code == dst_airport_code:
-                return True
-        return False
+                return f
+        return None
 
     def flights_where(self, airport_code: str) -> list[Flight]:
         flights = []
