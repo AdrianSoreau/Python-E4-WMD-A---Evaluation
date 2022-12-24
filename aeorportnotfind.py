@@ -1,0 +1,2 @@
+class AeroNotFound(Exception):
+    pass
