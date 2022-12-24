@@ -69,13 +69,13 @@ def test_flight_path():
     flight_map.import_airports('./doc/aeroports.csv')
 
     # Récupération de l'aéroport de départ
-    src_airport = flight_map.airport_find('CDG')
+    src_airport = flight_map.airport_find_path('CDG')
 
     # Création de l'objet FlightPath
     path = FlightPath(src_airport)
 
     # Récupération de l'aéroport de destination
-    dst_airport = flight_map.airport_find('AMS')
+    dst_airport = flight_map.airport_find_path('HHH')
 
     # Récupération du vol qui relie src_airport et dst_airport
     via_flight = flight_map.flight_exist(src_airport.code, dst_airport.code)
